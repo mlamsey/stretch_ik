@@ -13,13 +13,13 @@ import hello_helpers.hello_misc as hm
 ##################################################
 
 class MODES(Enum):
-    IDLE: 0
-    POSE_IDLE: 1
-    GET_POSE: 2
-    MOVE_TO_POSE: 3
-    HOME: 4
-    STOW: 5
-    QUIT: 99
+    IDLE = 0
+    POSE_IDLE = 1
+    GET_POSE = 2
+    MOVE_TO_POSE = 3
+    HOME = 4
+    STOW = 5
+    QUIT = 99
 
 ##################################################
 # Menus
@@ -32,11 +32,10 @@ def print_main_menu():
     print("(H) Home")
     print("(S) Stow")
     print("(Q) Quit")
-    print(" ")
 
 def parse_main_menu(ui: str) -> MODES:
     if ui == "m":
-        return MODES.MOVE_TO_POSE
+        return MODES.POSE_IDLE
     elif ui == "h":
         return MODES.HOME
     elif ui == "s":
@@ -49,13 +48,12 @@ def parse_main_menu(ui: str) -> MODES:
 def print_pose_menu():
     n = 10
     print("=" * n + " POSE MENU " + "=" * n)
-    print("(P) Enter Pose")
+    print("(E) Enter Pose")
     print("(G) Go to Pose")
     print("(Q) Back to Main Menu")
-    print(" ")
 
 def parse_pose_menu(ui: str) -> MODES:
-    if ui == "p":
+    if ui == "e":
         return MODES.GET_POSE
     elif ui == "g":
         return MODES.MOVE_TO_POSE
@@ -79,20 +77,31 @@ def get_target_pose_ui() -> list:
     x = get_input("x: ")
     y = get_input("y: ")
     z = get_input("z: ")
-    r = get_input("roll: ")
-    p = get_input("pitch: ")
-    y = get_input("yaw: ")
+    roll = get_input("roll: ")
+    pitch = get_input("pitch: ")
+    yaw = get_input("yaw: ")
 
     return [
         float(x),
         float(y),
         float(z),
-        float(r),
-        float(p),
-        float(y)
+        float(roll),
+        float(pitch),
+        float(yaw)
     ]
 
-def get_input(prompt_str: str="Input: "):
+def get_input(prompt_str: str="Input: ") -> str:
+    """
+    Returns lowercase user input.
+
+    Args:
+        prompt_str (str): prompt for user input
+    
+    Returns:
+        str: lowercase user input
+    """
+
+    print(' ')
     return input(prompt_str).lower()
 
 ##################################################
@@ -137,8 +146,15 @@ class DemoNode(hm.HelloNode):
         })
 
     def move(self):
+        # Check if pose is set
         if self.latest_target_pose is None:
             rospy.logwarn("DemoNode::move: No target pose set, aborting...")
+            return
+
+        # Confirm with user
+        print("Move to pose {}?".format(self.latest_target_pose))
+        ui = get_input("(Y/N): ")
+        if ui != "y":
             return
 
         # extract target position and orientation, convert to rotation matrix for IK
@@ -154,6 +170,7 @@ class DemoNode(hm.HelloNode):
             print(e)
             return
 
+        # go
         self.move_to_pose(ik_soln)
 
     def main(self):
@@ -172,7 +189,7 @@ class DemoNode(hm.HelloNode):
 
             elif self.mode == MODES.GET_POSE:
                 self.latest_target_pose = get_target_pose_ui()
-                self.mode = MODES.IDLE
+                self.mode = MODES.POSE_IDLE
 
             elif self.mode == MODES.MOVE_TO_POSE:
                 self.move()

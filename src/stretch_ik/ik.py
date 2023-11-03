@@ -1,7 +1,7 @@
 import ikpy.chain
 import numpy as np
 import json
-from utils import rotation_matrix_to_rpy
+from stretch_ik.utils import rotation_matrix_to_rpy
 
 from typing import List
 
@@ -148,7 +148,7 @@ class StretchDexIK:
         stretch_pose = StretchDexPose()
         
         if initial_pose is None:
-            q0 = stretch_pose.get_raw_pose()
+            q0 = stretch_pose.get_pose_vector()
         else:
             q0 = initial_pose
 
