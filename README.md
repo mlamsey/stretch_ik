@@ -2,13 +2,25 @@
 
 Inverse Kinematics for the Hello Robot Stretch... nice!
 
+Intended for use directly on a Hello Robot Stretch. Tested on an RE2, but should work fine on an RE1. Current implementation is for Stretches with a **Dexterous Wrist**.
+
+This implementation is heavily based on the [Hello Robot IK tutorial](https://github.com/hello-robot/stretch_tutorials/blob/master/stretch_body/jupyter/inverse_kinematics.ipynb). See [this video](https://www.youtube.com/watch?v=lfZRAdcHanU) for a walkthrough!
+
 ## Contact
 
 Matt Lamsey - lamsey [AT] gatech [DOT] edu
 
 # Installation
 
-The usual:
+## Dependencies
+
+Depends on `ikpy` [[docs here](https://ikpy.readthedocs.io/en/latest/)]
+
+`pip3 install -q ikpy`
+
+## ROS Package
+
+1. The usual ROS package install:
 
 ```bash
 cd ~/catkin_ws/src
@@ -18,19 +30,17 @@ catkin_make
 source devel/setup.bash
 ```
 
-## Dependencies
-
-Depends on `ikpy` - TODO: install commands
-
 ## Making a URDF for `ikpy`
 
-The `urdf` folder contains a simplified URDF for `ikpy` to use. If you want to regenerate it (e.g. if you calibrated your Stretch URDF), follow these steps:
+The `/urdf` folder already contains a simplified URDF for `ikpy` to use. If you want to regenerate it (e.g. if you calibrated your Stretch URDF), follow these steps:
 
 1. `cd` into `/src`
 
-2. `python urdf_ripper.py --urdf_path /path/to/original/urdf/stretch.urdf --output_path /path/to/output/urdf/stretch.urdf`
+2. `python urdf_ripper.py --save_path /path/to/output/urdf/stretch.urdf`
 
-The `urdf_ripper.py` script will remove all the unnecessary links and joints from the original URDF, and save it to the output path. It's based on [this tutorial](https://github.com/hello-robot/stretch_tutorials/blob/master/stretch_body/jupyter/inverse_kinematics.ipynb).
+3. Move the output urdf into `/urdf` and make sure that it's named `stretch.urdf`
+
+The `urdf_ripper.py` script will remove all the unnecessary links and joints from the original URDF, and save it to the output path. It's based on the notebook in [this tutorial](https://github.com/hello-robot/stretch_tutorials/blob/master/stretch_body/jupyter/inverse_kinematics.ipynb).
 
 # Usage
 
