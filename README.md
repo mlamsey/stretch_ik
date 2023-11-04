@@ -44,6 +44,10 @@ The `urdf_ripper.py` script will remove all the unnecessary links and joints fro
 
 # Usage
 
+NOTE: the robot's base coordinate system. +X is forwards, +Y is **retracting** the arm (so you'll often use -Y commands), +Z is up / against gravity, 0 roll and 0 pitch are level, and 0 yaw is aligned with +X.
+
+## Code
+
 Example python usage:
 ```python
 from stretch_ik.ik import StretchDexIK
