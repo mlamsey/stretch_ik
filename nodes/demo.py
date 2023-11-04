@@ -3,6 +3,7 @@ import rospy
 import rospkg
 import os
 from enum import Enum
+from typing import List
 
 from stretch_ik.ik import StretchDexIK
 from stretch_ik.utils import rpy_to_rotation_matrix
@@ -13,6 +14,10 @@ import hello_helpers.hello_misc as hm
 ##################################################
 
 class MODES(Enum):
+    """
+    States for the demo state machine
+    """
+
     IDLE = 0
     POSE_IDLE = 1
     GET_POSE = 2
@@ -25,7 +30,11 @@ class MODES(Enum):
 # Menus
 ##################################################
 
-def print_main_menu():
+def print_main_menu() -> None:
+    """
+    Prints main menu to terminal.
+    """
+
     n = 10
     print("=" * n + " MAIN MENU " + "=" * n)
     print("(M) Move to Pose")
@@ -34,6 +43,16 @@ def print_main_menu():
     print("(Q) Quit")
 
 def parse_main_menu(ui: str) -> MODES:
+    """
+    Parses main menu input.
+
+    Args:
+        ui (str): user input
+
+    Returns:
+        MODES (enum): new mode for demo state machine.
+    """
+
     if ui == "m":
         return MODES.POSE_IDLE
     elif ui == "h":
@@ -45,7 +64,11 @@ def parse_main_menu(ui: str) -> MODES:
     else:
         return MODES.IDLE
 
-def print_pose_menu():
+def print_pose_menu() -> None:
+    """
+    Prints pose menu to terminal.
+    """
+
     n = 10
     print("=" * n + " POSE MENU " + "=" * n)
     print("(E) Enter Pose")
@@ -53,6 +76,16 @@ def print_pose_menu():
     print("(Q) Back to Main Menu")
 
 def parse_pose_menu(ui: str) -> MODES:
+    """
+    Parses pose menu input.
+
+    Args:
+        ui (str): user input
+
+    Returns:
+        MODES (enum): new mode for demo state machine.
+    """
+
     if ui == "e":
         return MODES.GET_POSE
     elif ui == "g":
@@ -66,7 +99,7 @@ def parse_pose_menu(ui: str) -> MODES:
 # UI
 ##################################################
 
-def get_target_pose_ui() -> list:
+def get_target_pose_ui() -> List:
     """
     Prompts user for a pose (x, y, z, roll, pitch, yaw)
     
@@ -119,7 +152,7 @@ class DemoNode(hm.HelloNode):
         rospy.loginfo(f"DemoNode::__init__: Loading URDF from {urdf_path}")
         self.ik_engine = StretchDexIK(urdf_path)
     
-    def home(self):
+    def home(self) -> None:
         """
         Moves robot to home position.
         """
@@ -132,7 +165,7 @@ class DemoNode(hm.HelloNode):
             "joint_wrist_roll": 0.0
         })
 
-    def stow(self):
+    def stow(self) -> None:
         """
         Moves robot to stowed position.
         """
@@ -145,17 +178,26 @@ class DemoNode(hm.HelloNode):
             "joint_wrist_roll": 0.0
         })
 
-    def move(self):
+    def move(self, bool_confirm: bool=True) -> None:
+        """
+        Moves the robot to the pose stored in self.latest_pose.
+        
+        Args:
+            bool_confirm (bool): whether to confirm the move (via command line input)
+        """
+
         # Check if pose is set
         if self.latest_target_pose is None:
             rospy.logwarn("DemoNode::move: No target pose set, aborting...")
             return
 
         # Confirm with user
-        print("Move to pose {}?".format(self.latest_target_pose))
-        ui = get_input("(Y/N): ")
-        if ui != "y":
-            return
+        if bool_confirm:
+            print("Move to pose {}?".format(self.latest_target_pose))
+            ui = get_input("(Y/N): ")
+            if ui != "y":
+                print("Aborting!\n")
+                return
 
         # extract target position and orientation, convert to rotation matrix for IK
         target = self.latest_target_pose
@@ -173,7 +215,11 @@ class DemoNode(hm.HelloNode):
         # go
         self.move_to_pose(ik_soln)
 
-    def main(self):
+    def main(self) -> None:
+        """
+        Main loop for the demo. Runs as a state machine.
+        """
+
         hm.HelloNode.main(self, 'stretch_controller', 'stretch_namespace', wait_for_first_pointcloud=False)
         
         # main loop!

@@ -10,7 +10,6 @@ def make_ik_urdf(save_path: str):
     Creates a simplified URDF file for use with the IK solver.
 
     Args:
-        urdf_path (str): Path to the original URDF file.
         save_path (str): Path to save the modified URDF file.
     """
     
@@ -67,7 +66,7 @@ def make_ik_urdf(save_path: str):
     # save
     if not save_path.endswith('.urdf'):
         save_path += '.urdf'
-        
+
     print("\nSaving to {}".format(save_path))
     modified_urdf.save(save_path)
 

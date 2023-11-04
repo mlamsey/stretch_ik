@@ -110,7 +110,6 @@ class StretchDexIK:
         """
         Args:
             urdf_path (str): Path to Stretch's URDF file.
-            [NOTE: use the ]
         """
         self.chain = ikpy.chain.Chain.from_urdf_file(urdf_path)
         self.joint_lookup = {link.name: i for i, link in enumerate(self.chain.links)}
